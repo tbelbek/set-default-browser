@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -14,7 +15,7 @@ namespace SetDefaultBrowser
             var browsers = BrowserRegistry.GetInstalledBrowsers();
 
             var args = Args.TryParse(rawArgs);
-            if (args == null)
+            if (args == null && string.IsNullOrEmpty(ConfigurationSettings.AppSettings["BrowserName"]))
             {
                 //Using message boxes for output so we don't have to show a console window.
                 MessageBox.Show(text: Args.GetUsageText(FormattedInstalledBrowsers(browsers)), caption: ApplicationTitle, buttons: MessageBoxButtons.OK, icon: MessageBoxIcon.Information);
@@ -27,7 +28,7 @@ namespace SetDefaultBrowser
                     throw new EnvironmentException("Didn't find any web browsers installed.");
 
                 //Using a current culture string comparison here since we're comparing user input against display text.
-                var browser = browsers.FirstOrDefault(b => b.DisplayName.Equals(args.BrowserName, StringComparison.CurrentCulture));
+                var browser = browsers.FirstOrDefault(b => b.DisplayName.Equals(ConfigurationSettings.AppSettings["BrowserName"], StringComparison.CurrentCulture));
                 if (browser == null)
                     throw new EnvironmentException($"Didn't find a web browser with the name '{args.BrowserName}'.\n\nPlease use one of the following:\n{FormattedInstalledBrowsers(browsers)}");
 
